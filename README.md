@@ -1,7 +1,7 @@
 # Floyd Player 
 ## Learning GO - Simple M3U List player with mplayer
 
-#### Player
+#### Playlist 
 ![Playlist](screenshots/floyd.png?raw=true)
 #### Mplayer 
 ![mplayer](screenshots/mplayer.png?raw=true)
