@@ -2,7 +2,8 @@
 ## Learning GO - Simple M3U List player with mplayer
 
 #### Player
-![playlist](screenshots/floyd.png?raw=true)
+![Playlist](screenshots/floyd.png?raw=true)
+#### Mplayer 
 ![mplayer](screenshots/mplayer.png?raw=true)
 
 ```
