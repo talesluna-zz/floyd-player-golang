@@ -10,7 +10,7 @@ package main
 func main() {
 
 	// Set m3u file ... OH GOD!! Why you do not create a "Open File Dialog" ?
-	FILE := "/home/blaster/Documentos/IPTV/films.m3u"
+	FILE := "path/to/you/file.m3u"
 
 	// Parse to list
 	playlist := readM3U(FILE)
