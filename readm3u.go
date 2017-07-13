@@ -11,7 +11,6 @@ import (
 	"strings"
 	"os"
 	"bufio"
-	"errors"
 	"strconv"
 )
 
@@ -23,7 +22,8 @@ func readM3U(path string) (Playlist) {
 	// Try open file and read buffer
 	file, err := os.Open(path)
 	if err != nil {
-		errors.New("[ERROR] File not found or permission denied")
+		println("\n [!] " + err.Error() + " \n")
+		os.Exit(0)
 	}
 
 	defer file.Close()

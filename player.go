@@ -21,6 +21,7 @@ import (
 	_ "image/png"
 	_ "image/gif"
 	_ "golang.org/x/image/bmp"
+	"strconv"
 )
 
 type Playlist struct {
@@ -53,17 +54,17 @@ func setPlaylist(list Playlist)  {
 func initPlayerWindow(driver gxui.Driver)  {
 
 	// Window init settings
-	width 	:= 1424
-	height 	:= 768
+	width 	:= 1000
+	height 	:= 600
 	title	:= defaultTitle
 
 	// Create Window
-	theme	:= dark.CreateTheme(driver)
-	window	:= theme.CreateWindow(width, height, title)
+	theme		:= dark.CreateTheme(driver)
+	window		:= theme.CreateWindow(width, height, title)
 
 	// Window pos-properties
-	window.SetBorderPen(gxui.Pen{5, gxui.Gray15})
 	window.SetPadding(math.Spacing{10,0,10,0})
+	window.SetBackgroundBrush(gxui.Brush{gxui.Gray15})
 	window.OnClose(closePlayer)
 
 	// Media info panel
@@ -73,14 +74,14 @@ func initPlayerWindow(driver gxui.Driver)  {
 	// Panels, right and left
 	panelLeft 	:= theme.CreatePanelHolder()
 	panelRight 	:= theme.CreatePanelHolder()
-	panelLeft.SetSize(math.Size{400, 600})
+	panelLeft.SetSize(math.Size{900, height})
+	panelLeft.SetMargin(math.Spacing{5,0,0,10})
+	panelRight.SetSize(math.Size{100, height})
+	panelRight.SetVisible(false)
 
 	// Info text
 	infoLayout 	:= theme.CreateSplitterLayout()
-	infoLabel 	:= theme.CreateLabel()
-	infoLabel.SetVerticalAlignment(gxui.AlignTop)
-	infoLabel.SetText("Selecione algo na playlist")
-	infoLayout.AddChild(infoLabel)
+
 
 	// List Adapter
 	listAdapter := gxui.CreateDefaultAdapter()
@@ -100,12 +101,13 @@ func initPlayerWindow(driver gxui.Driver)  {
 		window.SetTitle(defaultTitle + " | " + media.Name)
 		panelRight.RemovePanel(infoLayout)
 		infoLayout = getInfoLayout(media, theme)
-		panelRight.AddPanel(infoLayout, "Assistir")
+		panelRight.AddPanel(infoLayout, "Play")
+		panelRight.SetVisible(true)
 	})
 
 	// Add elements to panels
-	panelLeft.AddPanel(playlistTree, "Minha Playlist")
-	panelRight.AddPanel(infoLayout, "Assistir")
+	panelLeft.AddPanel(playlistTree, "Playlist - " + strconv.Itoa(len(playlist.Medias)))
+	panelRight.AddPanel(infoLayout, "Play")
 
 	// Add panels to layout
 	layout.AddChild(panelLeft)
@@ -125,10 +127,11 @@ func getInfoLayout(media MediaInfo, theme gxui.Theme) (gxui.SplitterLayout) {
 	titleLabel 	:= theme.CreateLabel()
 
 	// Show media name and group
-	titleLabel.SetText(media.Group + " - " + media.Name)
+	titleLabel.SetMultiline(true)
+	titleLabel.SetText("[ " + media.Group + " ]\n\n" + media.Name)
 	titleLabel.SetVerticalAlignment(gxui.AlignMiddle)
 	titleLabel.SetHorizontalAlignment(gxui.AlignCenter)
-	titleLabel.SetColor(gxui.Gray40)
+	titleLabel.SetColor(gxui.White)
 	titleLabel.SetMargin(math.Spacing{5,5,5,5})
 
 	// Load RGBA of log to make texture
@@ -138,36 +141,42 @@ func getInfoLayout(media MediaInfo, theme gxui.Theme) (gxui.SplitterLayout) {
 		texture := theme.Driver().CreateTexture(logoRgba, 1)
 
 		imageLogo := theme.CreateImage()
-		imageLogo.SetMargin(math.Spacing{10,10,0,0})
 		imageLogo.SetTexture(texture)
-
+		imageLogo.SetMargin(math.Spacing{1,30,1,0})
 		infoLayout.AddChild(imageLogo)
 		infoLayout.SetChildWeight(imageLogo, 1)
 	}
 
 	// Play button
 	playButton := theme.CreateButton()
-	playButton.SetText("Assistir")
+	playButton.SetBorderPen(gxui.Pen{2,gxui.Blue10})
+	playButton.SetMargin(math.Spacing{5,0,5,10})
 	playButton.SetVerticalAlignment(gxui.AlignMiddle)
 	playButton.SetHorizontalAlignment(gxui.AlignCenter)
-	playButton.SetBackgroundBrush(gxui.Brush{gxui.Green20})
+	playButton.SetBackgroundBrush(gxui.Brush{gxui.Red50})
+
+	playButtonLabel := theme.CreateLabel()
+	playButtonLabel.SetMultiline(true)
+	playButtonLabel.SetText("\nPLAY")
+
+	playButton.AddChild(playButtonLabel)
 
 	// Exec mplayer and play media link
 	playButton.OnClick(func(event gxui.MouseEvent) {
-		exec.Command("mplayer","-zoom","-fs",media.MediaURI).Run()
+		exec.Command("mplayer","-zoom", media.MediaURI).Run()
 	})
 
 	// Info layout childs
 	infoLayout.AddChild(titleLabel)
 	infoLayout.AddChild(playButton)
-	infoLayout.SetChildWeight(titleLabel, 0.8)
+	infoLayout.SetChildWeight(titleLabel, 0.7)
 	infoLayout.SetChildWeight(playButton, 0.2)
 
 	return infoLayout
 }
 
 /*
-	Only to close appliection
+	Only to close application
  */
 func closePlayer()  {
 	os.Exit(0)
@@ -193,7 +202,7 @@ func loadLogo(url string) (image.Image) {
 	}
 
 	// Set a image size
-	pointMax 	:= image.Point{source.Bounds().Max.X,source.Bounds().Max.Y}
+	pointMax 	:= image.Point{source.Bounds().Max.X,source.Bounds().Max.Y*2}
 	pointMin 	:= image.Point{source.Bounds().Min.X,source.Bounds().Min.Y}
 	rectangle 	:= image.Rectangle{pointMin,pointMax}
 
