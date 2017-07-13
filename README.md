@@ -18,9 +18,11 @@ export GOPATH="../youPath"
 # Download packages
 go get github.com/golang/gxui
 
-# Run 
-go run *.go
+# Build
+go build -o floyd
 
-# Or build
-go build 
+# Run 
+go run *.go path/you/list.m3u   # For run dev code
+./floyd path/you/list.m3u       # For binary
+
 ```
